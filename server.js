@@ -124,7 +124,7 @@ app.post('/', async (req, res) => {
     // by this. This is why we write the svg file to server asynchronously.
     fs.writeFile(outputSvgFilePath, svgData, (err) => {
       if (err) {
-        console.err(`Issues writing ${outputSvgFilePath} to server file system`);
+        console.error(`Issues writing ${outputSvgFilePath} to server file system`);
       };
     });
 
@@ -235,9 +235,10 @@ app.post('/json', async (req, res) => {
 
     // render consoles
     page.on('console', async (msg) => {
-      if (msg && msg === '---zingchart_loaded---') {
+      // newer puppeteer versions use msg._text
+      // if (msg && msg._text === '---zingchart_loaded---') {
+      if (msg === '---zingchart_loaded---') {
         // clear server timeout
-        console.log('clearing timeout', serverTimeout)
         clearTimeout(serverTimeout);
 
         // wait 0 or user defined amount of time
@@ -277,7 +278,7 @@ app.post('/json', async (req, res) => {
         // by this. This is why we write the JSON file to server asynchronously.
         fs.writeFile(outputJSONFilePath, JSON.stringify(chartJSON, null, 2), (err) => {
           if (err) {
-            console.err(`Issues writing ${outputJSONFilePath} to server file system`);
+            console.error(`Issues writing ${outputJSONFilePath} to server file system`);
           };
         });
 

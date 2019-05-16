@@ -1,5 +1,6 @@
 # Headless Chrome Export Server 
-  
+ 
+Live version running on glitch [https://glitch.com/~zingchart-export-server](https://glitch.com/~zingchart-export-server) with a reachable endpoint of `https://zingchart-export-server.glitch.me` & `https://zingchart-export-server.glitch.me/json`
 
 ### Installation
 
