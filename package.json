@@ -1,0 +1,22 @@
+{
+  "name": "headless_chrome_export_server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "url": "git@gitlab.zingchart.com:nardecky/headless_chrome_export_server.git",
+    "type": "git"
+  },
+  "author": "Nick Ardecky <nardecky@zingchart.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.15.4",
+    "express-formidable": "^1.0.0",
+    "fs": "^0.0.1-security",
+    "puppeteer": "^0.9.0",
+    "zingchart": "^2.6.2"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}
