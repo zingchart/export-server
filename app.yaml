@@ -1,5 +1,5 @@
 runtime: nodejs10
-instance_class: F1
+instance_class: F4_1G
 service: default
 env_variables:
   NODE_ENV: production

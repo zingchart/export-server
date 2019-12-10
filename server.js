@@ -56,16 +56,13 @@ app.post('/', async (req, res) => {
     // Users CAN pass in a filename as well
     const fileId = _generateFileId();
     const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
-    const outputImageFilePath = `${__dirname}/tmp/images/${fileName}.${imgType}`;
-    const outputPDFFilePath = `${__dirname}/tmp/pdf/${fileName}.pdf`;
-    const outputSvgFilePath = `${__dirname}/tmp/svg/${fileName}.svg`;
 
     // local variables
-    let readFilePath = outputImageFilePath; // default behavior is png
     let isSvgFlag = false;
     let errorFlag = false;
     let errorMsg = 'N/A';
     let errorMsgServer = '';
+    let tmpBuffer = '';
 
     // launch the headless browser
     const browser = await puppeteer.launch().catch(err => {
@@ -108,29 +105,23 @@ app.post('/', async (req, res) => {
 
     // different actions for different types
     if (imgType === 'pdf') {
-      await page.pdf({
-        path: outputPDFFilePath
+      tmpBuffer = await page.pdf({
       }).catch(err => {
         errorFlag = true;
         errorMsg = 'Issues Generating PDF';
         errorMsgServer = err;
       });
-      readFilePath = outputPDFFilePath;
     } else if (imgType === 'svg') {
       isSvgFlag = true;
-      readFilePath = outputSvgFilePath;
     } else {
       // get the screenshot and close
-      await page.screenshot({
-        path: outputImageFilePath,
+      tmpBuffer = await page.screenshot({
         type: imgType
       }).catch(err => {
         errorFlag = true;
         errorMsg = 'Issues Generating Screenshot';
         errorMsgServer = err;
       });
-      // redundant assignment but explicit code when user is reading
-      readFilePath = outputImageFilePath;
     }
 
     // close connection
@@ -144,51 +135,51 @@ app.post('/', async (req, res) => {
 
     // We DON'T really care about this and don't want user speed to be affected
     // by this. This is why we write the svg file to server asynchronously.
-    fs.writeFile(outputSvgFilePath, svgData, (err) => {
-      if (err) {
-        console.error(`Issues writing ${outputSvgFilePath} to server file system`);
-      };
-    });
+    // fs.writeFile(outputSvgFilePath, svgData, (err) => {
+    //   if (err) {
+    //     console.error(`Issues writing ${outputSvgFilePath} to server file system`);
+    //   };
+    // });
 
     // read file asynchronously in case it never returns
-    fs.readFile(readFilePath, (err, imageFile) => {
+    // fs.readFile(readFilePath, (err, imageFile) => {
 
       // catch err
-      if (err) {
-        console.error(err);
-        return res.status(500).send('Issue Reading File From Server');
-      }
+      // if (err) {
+      //   console.error(err);
+      //   return res.status(500).send('Issue Reading File From Server');
+      // }
 
       // request headers
       let rHeaders = {
        'Content-Type': '',
-       'Content-Length': '',
-       'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
+      //  'Content-Length': '',
+      //  'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
       };
 
       // set appropriate mime/types
       switch (imgType) {
         case 'svg':
           rHeaders['Content-Type'] = 'image/svg+xml';
-          rHeaders['Content-Length'] = svgData.length;
+          // rHeaders['Content-Length'] = svgData.length;
           break;
         case 'pdf':
           rHeaders['Content-Type'] = 'application/pdf';
-          rHeaders['Content-Length'] = imageFile.length;
+          // rHeaders['Content-Length'] = imageFile.length;
           break;
         case 'png':
         case 'jpeg':
         default:
           rHeaders['Content-Type'] = `image/${imgType}`;
-          rHeaders['Content-Length'] = imageFile.length;
+          // rHeaders['Content-Length'] = imageFile.length;
       }
 
       // write headers
       res.writeHead(200, rHeaders);
 
       // end the buffer and send
-      return res.end(imageFile);
-    });
+      return res.end(tmpBuffer);
+    // });
 
   } catch(e) {
     console.error(e);
@@ -219,18 +210,14 @@ app.post('/json', async (req, res) => {
     // generate filed related variabeld
     const fileId = _generateFileId();
     const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
-    const outputImageFilePath = `${__dirname}/tmp/images/${fileName}.${imgType}`;
-    const outputPDFFilePath = `${__dirname}/tmp/pdf/${fileName}.pdf`;
-    const outputJSONFilePath = `${__dirname}/tmp/svg/${fileName}.json`;
-
 
     // local variables
-    let readFilePath = outputImageFilePath; // default behavior is png
     let isSvgFlag = false;
     let errorFlag = false;
     let errorMsg = 'N/A';
     let errorMsgServer = '';
     let serverTimeout = null;
+    let tmpBuffer = '';
 
     // launch the headless browser
     const browser = await puppeteer.launch().catch(err => {
@@ -275,26 +262,21 @@ app.post('/json', async (req, res) => {
 
         // different actions for different types
         if (imgType === 'pdf') {
-          await page.pdf({
-            path: outputPDFFilePath
+          tmpBuffer = await page.pdf({
           }).catch(err => {
             errorFlag = true;
             errorMsg = 'Issues Generating PDF';
             errorMsgServer = err;
           });
-          readFilePath = outputPDFFilePath;
         } else {
           // get the screenshot and close
-          await page.screenshot({
-            path: outputImageFilePath,
+          tmpBuffer = await page.screenshot({
             type: imgType
           }).catch(err => {
             errorFlag = true;
             errorMsg = 'Issues Generating Screenshot';
             errorMsgServer = err;
           });
-          // redundant assignment but explict when user is reading
-          readFilePath = outputImageFilePath;
         }
 
         // close connection
@@ -308,47 +290,47 @@ app.post('/json', async (req, res) => {
 
         // We DON'T really care about this and don't want user speed to be affected
         // by this. This is why we write the JSON file to server asynchronously.
-        fs.writeFile(outputJSONFilePath, JSON.stringify(chartJSON, null, 2), (err) => {
-          if (err) {
-            console.error(`Issues writing ${outputJSONFilePath} to server file system`);
-          };
-        });
+        // fs.writeFile(outputJSONFilePath, JSON.stringify(chartJSON, null, 2), (err) => {
+        //   if (err) {
+        //     console.error(`Issues writing ${outputJSONFilePath} to server file system`);
+        //   };
+        // });
 
         // read file asynchronously in case it never returns
-        fs.readFile(readFilePath, (err, imageFile) => {
+        // fs.readFile(readFilePath, (err, imageFile) => {
 
           // catch err
-          if (err) {
-            console.error(err);
-            return res.status(500).send('Issue Reading File From Server');
-          }
+          // if (err) {
+          //   console.error(err);
+          //   return res.status(500).send('Issue Reading File From Server');
+          // }
 
           // request headers
           let rHeaders = {
           'Content-Type': '',
-          'Content-Length': '',
-          'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
+          // 'Content-Length': '',
+          // 'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
           };
 
           // set appropriate mime/types
           switch (imgType) {
             case 'pdf':
               rHeaders['Content-Type'] = 'application/pdf';
-              rHeaders['Content-Length'] = imageFile.length;
+              // rHeaders['Content-Length'] = imageFile.length;
               break;
             case 'png':
             case 'jpeg':
             default:
               rHeaders['Content-Type'] = `image/${imgType}`;
-              rHeaders['Content-Length'] = imageFile.length;
+              // rHeaders['Content-Length'] = imageFile.length;
           }
 
           // write headers
           res.writeHead(200, rHeaders);
 
           // end the buffer and send
-          return res.end(imageFile);
-        });
+          return res.end(tmpBuffer);
+        // });
       }
     });
   
