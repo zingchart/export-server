@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "repository": {
-    "url": "git@gitlab.zingchart.com:nardecky/headless_chrome_export_server.git",
+    "url": "git@gitlab.zingsoft.com:nardecky/headless_chrome_export_server.git",
     "type": "git"
   },
   "scripts": {
@@ -11,7 +11,7 @@
     "dev:debug": "node --inspector-brk=9229 server.js",
     "reset": "rm -rf node_modules && rm package-lock.json"
   },
-  "author": "Nick Ardecky <nardecky@zingchart.com>",
+  "author": "ZingSoft Inc",
   "license": "MIT",
   "dependencies": {
     "cors": "2.8.4",

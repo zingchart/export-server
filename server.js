@@ -56,24 +56,27 @@ app.post('/', async (req, res) => {
     // Users CAN pass in a filename as well
     const fileId = _generateFileId();
     const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
-    const outputImageFilePath = `./tmp/images/${fileName}.${imgType}`;
-    const outputPDFFilePath = `./tmp/pdf/${fileName}.pdf`;
-    const outputSvgFilePath = `./tmp/svg/${fileName}.svg`;
+    const outputImageFilePath = `${__dirname}/tmp/images/${fileName}.${imgType}`;
+    const outputPDFFilePath = `${__dirname}/tmp/pdf/${fileName}.pdf`;
+    const outputSvgFilePath = `${__dirname}/tmp/svg/${fileName}.svg`;
 
     // local variables
     let readFilePath = outputImageFilePath; // default behavior is png
     let isSvgFlag = false;
     let errorFlag = false;
     let errorMsg = 'N/A';
+    let errorMsgServer = '';
 
     // launch the headless browser
     const browser = await puppeteer.launch().catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
     const page = await browser.newPage().catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
 
     // set the viewport size to the chart size
@@ -84,16 +87,19 @@ app.post('/', async (req, res) => {
     }).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
 
     // set the svg contents
     await page.setContent(svgData).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
 
     // don't even try to screenshot from any of the above errors
     if (errorFlag) {
+      console.error(errorMsgServer);
       return res.status(500).send(errorMsg);
     }
 
@@ -107,6 +113,7 @@ app.post('/', async (req, res) => {
       }).catch(err => {
         errorFlag = true;
         errorMsg = 'Issues Generating PDF';
+        errorMsgServer = err;
       });
       readFilePath = outputPDFFilePath;
     } else if (imgType === 'svg') {
@@ -120,6 +127,7 @@ app.post('/', async (req, res) => {
       }).catch(err => {
         errorFlag = true;
         errorMsg = 'Issues Generating Screenshot';
+        errorMsgServer = err;
       });
       // redundant assignment but explicit code when user is reading
       readFilePath = outputImageFilePath;
@@ -130,6 +138,7 @@ app.post('/', async (req, res) => {
 
     // catch screenshot issues
     if (errorFlag) {
+      console.error(errorMsgServer);
       return res.status(500).send(errorMsg);
     }
 
@@ -146,6 +155,7 @@ app.post('/', async (req, res) => {
 
       // catch err
       if (err) {
+        console.error(err);
         return res.status(500).send('Issue Reading File From Server');
       }
 
@@ -209,9 +219,9 @@ app.post('/json', async (req, res) => {
     // generate filed related variabeld
     const fileId = _generateFileId();
     const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
-    const outputImageFilePath = `./tmp/images/${fileName}.${imgType}`;
-    const outputPDFFilePath = `./tmp/pdf/${fileName}.pdf`;
-    const outputJSONFilePath = `./tmp/svg/${fileName}.json`;
+    const outputImageFilePath = `${__dirname}/tmp/images/${fileName}.${imgType}`;
+    const outputPDFFilePath = `${__dirname}/tmp/pdf/${fileName}.pdf`;
+    const outputJSONFilePath = `${__dirname}/tmp/svg/${fileName}.json`;
 
 
     // local variables
@@ -219,16 +229,19 @@ app.post('/json', async (req, res) => {
     let isSvgFlag = false;
     let errorFlag = false;
     let errorMsg = 'N/A';
+    let errorMsgServer = '';
     let serverTimeout = null;
 
     // launch the headless browser
     const browser = await puppeteer.launch().catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
     const page = await browser.newPage().catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
 
     // set the viewport size to the chart size
@@ -239,12 +252,14 @@ app.post('/json', async (req, res) => {
     }).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
+      errorMsgServer = err;
     });
 
     // set the svg contents
     await page.setContent(`<div id="myChart"></div>`).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Injecting Chart Into Browser';
+      errorMsgServer = err;
     });
 
     // render consoles
@@ -265,6 +280,7 @@ app.post('/json', async (req, res) => {
           }).catch(err => {
             errorFlag = true;
             errorMsg = 'Issues Generating PDF';
+            errorMsgServer = err;
           });
           readFilePath = outputPDFFilePath;
         } else {
@@ -275,6 +291,7 @@ app.post('/json', async (req, res) => {
           }).catch(err => {
             errorFlag = true;
             errorMsg = 'Issues Generating Screenshot';
+            errorMsgServer = err;
           });
           // redundant assignment but explict when user is reading
           readFilePath = outputImageFilePath;
@@ -285,6 +302,7 @@ app.post('/json', async (req, res) => {
 
         // catch screenshot issues
         if (errorFlag) {
+          console.error(errorMsgServer);
           return res.status(500).send(errorMsg);
         }
 
@@ -301,6 +319,7 @@ app.post('/json', async (req, res) => {
 
           // catch err
           if (err) {
+            console.error(err);
             return res.status(500).send('Issue Reading File From Server');
           }
 
@@ -345,7 +364,6 @@ app.post('/json', async (req, res) => {
     
     // render zingchart
     await page.evaluate(({chartWidth, chartHeight, chartJSON}) => {
-      console.log('ay', zingchart);
       // set modules path
       zingchart.MODULESDIR = 'https://cdn.zingchart.com/modules/';
       // trigger the event to take a photo
@@ -361,10 +379,12 @@ app.post('/json', async (req, res) => {
     }, {chartWidth, chartHeight, chartJSON} ).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Rendering ZingChart Into Browser';
+      errorMsgServer = err;
     });
   
     // dont even try to screenshot from any of the above
     if (errorFlag) {
+      console.error(errorMsgServer);
       return res.status(500).send(errorMsg);
     }
 

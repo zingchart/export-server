@@ -26,6 +26,8 @@ can be found [here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/a
  
 #### Params for this route are as follows
 
+Important to note the port takes form data that is x-ww-form-urlencoded.
+
 ```
 /*
  * retrieve a chart image and return it
@@ -39,6 +41,7 @@ can be found [here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/a
  */
 app.post('/', async (req, res) => {
 ```
+![](http://capture.zingsoft.com/b09dfbf6b383/download/Image%2525202019-12-09%252520at%2525206.08.13%252520PM.png)
 
 2) We have secondary route `/json` which functions by taking a chart JSON and outputting a png, jpeg or pdf.
  
