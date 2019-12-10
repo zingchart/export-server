@@ -22,6 +22,18 @@ const _generateFileId = () => {
   return Math.random().toString(36).substr(2, 10);
 }
 
+/**
+ * @todo expand on filename validation checks
+ * @description Verify filename doesn't have any special characters
+ * and DOES not start with a number
+ * @param {*} fileName 
+ */
+function _isValidFilename(fileName) {
+  // check if filename string starts with number
+  if (fileName.match(/^[0-9a]+/)) return false;
+  return true;
+}
+
 /*
  * retrieve a chart image and return it
  * takes form-data, x-ww-form-urlencoded, and JSON
@@ -30,6 +42,7 @@ const _generateFileId = () => {
  * w => width(String or Number)
  * svg => raw svg string data (NOT JSON stringified)
  * t => type (png, jpeg, pdf, svg)
+ * fn => filename (String)
  */
 app.post('/', async (req, res) => {
   try {
@@ -39,13 +52,13 @@ app.post('/', async (req, res) => {
     const chartWidth = (req.fields && req.fields.w);
     const imgType = (req.fields && req.fields.t) || 'png';
 
-    // generate filed related variabeld
+    // generate filed related variabe ld.
+    // Users CAN pass in a filename as well
     const fileId = _generateFileId();
-    const fileName = `zc_chart_${fileId}`;
+    const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
     const outputImageFilePath = `./tmp/images/${fileName}.${imgType}`;
     const outputPDFFilePath = `./tmp/pdf/${fileName}.pdf`;
     const outputSvgFilePath = `./tmp/svg/${fileName}.svg`;
-
 
     // local variables
     let readFilePath = outputImageFilePath; // default behavior is png
@@ -79,7 +92,7 @@ app.post('/', async (req, res) => {
       errorMsg = 'Issues With Headless Browser';
     });
 
-    // dont even try to screenshot from any of the above
+    // don't even try to screenshot from any of the above errors
     if (errorFlag) {
       return res.status(500).send(errorMsg);
     }
@@ -108,7 +121,7 @@ app.post('/', async (req, res) => {
         errorFlag = true;
         errorMsg = 'Issues Generating Screenshot';
       });
-      // redundant assignment but explict when user is reading
+      // redundant assignment but explicit code when user is reading
       readFilePath = outputImageFilePath;
     }
 
@@ -169,7 +182,7 @@ app.post('/', async (req, res) => {
 
   } catch(e) {
     console.error(e);
-    res.status(500).send('Issue Generating Image from Server');
+    res.status(500).send('Issue Generating Image from Server',);
   }
 });
 
@@ -181,6 +194,7 @@ app.post('/', async (req, res) => {
  * w => width(String or Number)
  * chartJSON => JSON for chart to render
  * t => type (png, jpeg, pdf),
+ * fn => filename (String)
  * wait => milliseconds delay for taking screenshot
  */
 app.post('/json', async (req, res) => {
@@ -194,7 +208,7 @@ app.post('/json', async (req, res) => {
 
     // generate filed related variabeld
     const fileId = _generateFileId();
-    const fileName = `zc_chart_${fileId}`;
+    const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
     const outputImageFilePath = `./tmp/images/${fileName}.${imgType}`;
     const outputPDFFilePath = `./tmp/pdf/${fileName}.pdf`;
     const outputJSONFilePath = `./tmp/svg/${fileName}.json`;
@@ -236,8 +250,8 @@ app.post('/json', async (req, res) => {
     // render consoles
     page.on('console', async (msg) => {
       // newer puppeteer versions use msg._text
-      // if (msg && msg._text === '---zingchart_loaded---') {
-      if (msg === '---zingchart_loaded---') {
+      if (msg && msg._text === '---zingchart_loaded---') {
+
         // clear server timeout
         clearTimeout(serverTimeout);
 
@@ -318,17 +332,22 @@ app.post('/json', async (req, res) => {
         });
       }
     });
-
+  
     // inject zingchart in
-    await page.evaluate(fs.readFileSync('./node_modules/zingchart/client/zingchart.min.js', 'utf8'));
-
+    await  page.addScriptTag({
+      url: 'https://cdn.zingchart.com/zingchart.min.js'
+    });
+    
     // set a timeout for 6 seconds if chart doesn't load
     serverTimeout = setTimeout(() => {
       return res.status(500).send('Server Timed Out');
     }, 10000 + waitTime);
-
+    
     // render zingchart
     await page.evaluate(({chartWidth, chartHeight, chartJSON}) => {
+      console.log('ay', zingchart);
+      // set modules path
+      zingchart.MODULESDIR = 'https://cdn.zingchart.com/modules/';
       // trigger the event to take a photo
       zingchart.bind(null, 'load', function() {
         console.log('---zingchart_loaded---');
@@ -383,6 +402,10 @@ app.post('*', (req, res, next) => {
 });
 
 // Start the application!
-app.listen(9085, function () {
-  console.log('Example app listening on port 9085!')
+// Start the server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`)
 });
+
+module.exports = app;

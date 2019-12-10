@@ -1,0 +1,5 @@
+runtime: nodejs10
+env: flex
+service: default
+env_variables:
+  NODE_ENV: stage

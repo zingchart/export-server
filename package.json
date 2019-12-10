@@ -6,17 +6,22 @@
     "url": "git@gitlab.zingchart.com:nardecky/headless_chrome_export_server.git",
     "type": "git"
   },
+  "scripts": {
+    "start": "node server.js",
+    "dev:debug": "node --inspector-brk=9229 server.js",
+    "reset": "rm -rf node_modules && rm package-lock.json"
+  },
   "author": "Nick Ardecky <nardecky@zingchart.com>",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.4",
-    "express": "^4.15.4",
-    "express-formidable": "^1.0.0",
-    "fs": "^0.0.1-security",
-    "puppeteer": "^0.9.0",
-    "zingchart": "^2.6.2"
+    "cors": "2.8.4",
+    "express": "4.15.4",
+    "express-formidable": "1.0.0",
+    "fs": "0.0.1-security",
+    "puppeteer": "1.19.0",
+    "zingchart": "^2.8.7"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": "10.x.x"
   }
 }

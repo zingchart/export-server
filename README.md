@@ -2,23 +2,27 @@
  
 Live version running on glitch [https://glitch.com/~zingchart-export-server](https://glitch.com/~zingchart-export-server) with a reachable endpoint of `https://zingchart-export-server.glitch.me` & `https://zingchart-export-server.glitch.me/json`
 
+### Deploying
+
+`gcloud app deploy --project export-server`
+
 ### Installation
 
-- run `yarn install`
-- run `node server.js` to instatiate the local server
+- run `npm install`
+- run `npm run start` to instantiate the local server
 
 ### Dependencies
 
 This has a strong dependency on the headless chrome API library **Puppeteer**. Documentation
-cand be found [here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#event-console)
+can be found [here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#event-console)
 
 ### Routes
 
-1) We have our default route `/` which functions **EXACTLY** as our current export server at [https://export.zingchart.com](https://export.zingchart.com). Documentation on this can be on the ZingChart site [here](https://www.zingchart.com/docs/api/export-chart/) and gitlab repo containting the code for that server [here](https://gitlab.zingchart.com/zingchart/export-server.
+1) We have our default route `/` which functions **EXACTLY** as our current export server at [https://export.zingchart.com](https://export.zingchart.com). Documentation on this can be on the ZingChart site [here](https://www.zingchart.com/docs/api/export-chart/) and gitlab repo containing the code for that server [here](https://gitlab.zingchart.com/zingchart/export-server.
 
   - This takes svg and renders it to the page. From there it takes a screenshot
   - You can change the ZingChart `EXPORTURL` like the following
-  - `zingchart.EXPORTURL = 'http://my.server.com/';` but since we have clientside rendering for canvas and svg (convert svg to image blob) we don't really need this
+  - `zingchart.EXPORTURL = 'https://my.server.com/';` but since we have client side rendering for canvas and svg (convert svg to image blob) we don't really need this.
  
 #### Params for this route are as follows
 
@@ -31,6 +35,7 @@ cand be found [here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/
  * w => width(String or Number)
  * svg => raw svg string data (NOT JSON stringified)
  * t => type (png, jpeg, pdf, svg)
+ * fn => filename (String)
  */
 app.post('/', async (req, res) => {
 ```
