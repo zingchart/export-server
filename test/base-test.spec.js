@@ -2,33 +2,16 @@ const utils = require('./test.utils').utils;
 const axios = require('axios');
 
 
-describe('Base Server Test', function() {
-  // Waits for database to connect
-  this.timeout(5000);
-
-  let subscriptionDefaults = {
-    req: function({sub}) {
-      return {
-        user: {
-          sub,
-        },
-      };
-    },
-  };
-
-  before(function(done) {
-    // Waits for quickbooks to initialize
-    // Quickbooks.init()
-    //   .then(function() {
-    //     done();
-    //   });
-    done();
-  });
+describe(`Server Route Test's`, function() {
+  // before(function(done) {
+  //   // Waits for quickbooks to initialize
+  //   done();
+  // });
 
   // getSubscriptions
   // ---------------------------------
   describe('Get Base Routes', function() {
-    it('/ Post Url is OK', function(done) {
+    it(' Post / Url is OK', function(done) {
       axios.post('http://localhost:8080/')
         .then(function (response) {
           // console.log(response);
@@ -41,8 +24,8 @@ describe('Base Server Test', function() {
         });
     });
 
-    it('/json Post Url is OK', function(done) {
-      axios.post('http://localhost:8080/')
+    it('Post /json Url is OK', function(done) {
+      axios.post('http://localhost:8080/json')
         .then(function (response) {
           // console.log(response);
           expect(response.statusText).to.equal('OK');
