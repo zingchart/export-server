@@ -1,0 +1,44 @@
+# define docker image to use
+image: devillex/docker-firebase:slim
+
+# define what to cache between stages AND pipelines
+# this is a shortcut for passing node_modules around
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  # Path to NVM install location
+  - export NVM_DIR="$HOME/.nvm"
+  - . ${NVM_DIR}/nvm.sh
+  - gitlab-runner --version
+  # Install dependent node version via NVM
+  - nvm --version
+  - nvm install 10.14
+  - node --version
+
+# define the stages of our pipeline
+stages:
+  - test
+  - deployment
+
+######################################################
+### COMMANDS ALWAYS RUN 
+######################################################
+
+## run unit tests
+test:unit:
+  stage: test
+  script:
+    - npm install
+    - npm run test
+  allow_failure: true
+
+# deploy:stage:
+#   stage: deployment
+#   script:
+#     - npm install
+#     - npm run test
+#   allow_failure: true
+#   dependencies:
+#     - test:unit

@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  title: ZingSoft Export Server
+  description: An online export service for ZingChart and ZingGrid.
+  version: 1.0.1
+servers:
+  - url: https://export-server.appspot.com/
+    description: The app engine instance of the export server.
+  - url: http://export.zingchart.com
+    description: The public DNS used for the export server.
+
+paths:
+  /:
+    post:
+      summary: Returns a chart image or pdf
+      requestBody:
+        description: A packet sent from ZingChart library and standard form inputs.
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+              - svg
+              properties:
+                svg:
+                  type: string
+                  description: The svg object rendered by ZingChart.
+                  example: "<svg ..."
+                t:
+                  type: string
+                  description: (Optional) The type of media output file to render.
+                  default: png
+                  example: "pdf"
+                  enum:
+                  - png
+                  - jpeg
+                  - pdf
+                  - svg
+                height:
+                  type: integer
+                  default: 500
+                  description: (Optional) The height of the chart to render.
+                  example: 1000
+                width:
+                  type: integer
+                  default: 500
+                  description: (Optional) The width of the chart to render.
+                  example: 1000
+                fn:
+                  type: string
+                  default: "zingchart-chart1.ext"
+                  description: (Optional) filename to download as e.g) "test-filename"
+                  example: "my-filename"
+      responses:
+        '200':
+          description: A chart image object.
+        '400':
+          description: The specified svg is missing.
+        default:
+          description: Unexpected Server Error
+  /json:
+    post:
+      summary: Returns a chart image, pdf or svg from the chart configuration passed in.
+      params:
+        description: A packet sent from ZingChart library and standard form inputs.
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+              - chartConfig
+              properties:
+                chartConfig:
+                  type: object
+                  description: The chart configuration object to be rendered by ZingChart.
+                  example: "{type: 'bar', series:[{values:[0,1,2,3]}]}"
+                t:
+                  type: string
+                  description: (Optional) The type of media output file to render.
+                  default: png
+                  example: "pdf"
+                  enum:
+                  - png
+                  - jpeg
+                  - pdf
+                  - svg
+                height:
+                  type: integer
+                  default: 500
+                  description: (Optional) The height of the chart to render.
+                  example: 1000
+                width:
+                  type: integer
+                  default: 500
+                  description: (Optional) The width of the chart to render.
+                  example: 1000
+                fn:
+                  type: string
+                  default: "zingchart-chart1.ext"
+                  description: (Optional) filename to download as e.g) "test-filename"
+                  example: "my-filename"
+      responses:
+        '200':
+          description: A chart image object.
+        '400':
+          description: The specified svg is missing.
+        default:
+          description: Unexpected Server Error

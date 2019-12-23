@@ -193,7 +193,7 @@ app.post('/', async (req, res) => {
  * @ parameters
  * h => height (String or Number)
  * w => width(String or Number)
- * chartJSON => JSON for chart to render
+ * chartConfig => JSON for chart to render
  * t => type (png, jpeg, pdf),
  * fn => filename (String)
  * wait => milliseconds delay for taking screenshot
@@ -201,12 +201,15 @@ app.post('/', async (req, res) => {
 app.post('/json', async (req, res) => {
   try {
     // grab all parameters
-    const chartJSON = (req.fields && req.fields.chartJSON) || '{title: {text: "No Chart JSON"}}';
+    const chartJSON = (req.fields && req.fields.chartConfig) || false;
     const chartHeight = (req.fields && req.fields.h);
     const chartWidth = (req.fields && req.fields.w);
     const imgType = (req.fields && req.fields.t) || 'png';
     const waitTime = (req.fields && req.fields.wait) || 0;
 
+    if (!chartJSON) {
+      res.status(400).send('No chartConfig was supplied');
+    }
     // generate filed related variabeld
     const fileId = _generateFileId();
     const fileName = (req.fields && req.fields.fn && _isValidFilename(req.fields.fn)) ? req.fields.fn : `zc_chart_${fileId}`;
