@@ -3,4 +3,3 @@ instance_class: F4_1G
 service: default
 env_variables:
   NODE_ENV: stage
-version: stage
