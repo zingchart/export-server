@@ -21,14 +21,16 @@ jobs:
     name: Publish and Deploy
     # define all the steps in the "build" stage
     steps:
+    # This step checks out a copy of your repository.
+    - uses: actions/checkout@v1
+    # This step checks out and logs in to gcloud
+    - uses: actions-hub/gcloud@master
     # Configure where to deploy export server
     - name: Deploy Stage
-      uses: actions-hub/gcloud@master
       if: github.ref == 'refs/heads/stage'
       run: |
         gcloud app deploy --version stage
     - name: Deploy Production
-      uses: actions-hub/gcloud@master
       if: github.ref == 'refs/heads/master'
       run: |
         gcloud app deploy
