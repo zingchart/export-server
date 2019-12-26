@@ -27,10 +27,10 @@ jobs:
 
     # Configure where to deploy export server
     - name: Deploy Stage
-      if: $GITHUB_REF	== 'stage'
+      if: github.ref == 'refs/heads/stage'
       run: |
         gcloud app deploy --version stage
     - name: Deploy Production
-      if: $GITHUB_REF	 == 'master'
+      if: github.ref == 'refs/heads/master'
       run: |
         gcloud app deploy
