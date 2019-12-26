@@ -23,14 +23,14 @@ jobs:
     # define all the steps in the "build" stage
     steps:
     # deploy to GAE step
-    - uses: actions-hub/gcloud@272.0.0
+    - uses: actions-hub/gcloud@master
       
     # Configure where to deploy export server
     - name: Deploy Stage
-      if: github.ref	== 'stage'
+      if: $GITHUB_REF	== 'stage'
       run: |
         gcloud app deploy --version stage
     - name: Deploy Production
-      if: github.ref	== 'master'
+      if: $GITHUB_REF	== 'master'
       run: |
         gcloud app deploy
