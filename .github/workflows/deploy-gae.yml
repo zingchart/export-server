@@ -1,0 +1,39 @@
+# overall CI pipeline name
+name: Deploy to GAE
+
+# only run on master and stage branches
+on:
+  push:
+    branches:
+    - master
+    - stage
+
+# Environment variables available to all jobs and steps in this workflow
+env:
+  CI: true
+    
+# jobs are the different pipelines
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    name: Publish and Deploy
+    # define all the steps in the "build" stage
+    steps:
+    # deploy to GAE step
+    - name: Google Cloud Platform (GCP) CLI - gcloud
+      uses: actions-hub/gcloud@272.0.0
+      with:
+        # Project id
+        PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
+        APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
+    # Configure where to deploy export server
+    - name: Deploy Stage
+      if: github.ref	== 'stage'
+      run: |
+        gcloud app deploy --version stage
+    - name: Deploy Production
+      if: github.ref	== 'master'
+      run: |
+        gcloud app deploy
