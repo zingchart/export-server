@@ -21,16 +21,14 @@ jobs:
     name: Publish and Deploy
     # define all the steps in the "build" stage
     steps:
-    # deploy to GAE step
-    - name: Google Cloud Platform (GCP) CLI - gcloud
-      uses: actions-hub/gcloud@272.0.0
-
     # Configure where to deploy export server
     - name: Deploy Stage
+      uses: actions-hub/gcloud@master
       if: github.ref == 'refs/heads/stage'
       run: |
         gcloud app deploy --version stage
     - name: Deploy Production
+      uses: actions-hub/gcloud@master
       if: github.ref == 'refs/heads/master'
       run: |
         gcloud app deploy
