@@ -9,9 +9,9 @@ on:
     - stage
 
 # Environment variables available to all jobs and steps in this workflow
-env:
-  PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
-  APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+# env:
+#   PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
+#   APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
     
 # jobs are the different pipelines
 jobs:
@@ -24,7 +24,13 @@ jobs:
     # This step checks out a copy of your repository.
     - uses: actions/checkout@v1
     # This step checks out and logs in to gcloud
-    - uses: actions-hub/gcloud@master
+    - name: test
+      uses: actions-hub/gcloud@master
+      with:
+        # Project id
+        PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
+        # GCP authorization credentials
+        APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
     # Configure where to deploy export server
     - name: Deploy Stage
       if: github.ref == 'refs/heads/stage'
