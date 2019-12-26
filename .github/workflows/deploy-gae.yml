@@ -27,7 +27,7 @@ jobs:
     - uses: actions-hub/gcloud@master
       env:
         # Project id
-        PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
+        PROJECT_ID: export-server
         # GCP authorization credentials
         APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
         # define to use gcloud over gsutil
