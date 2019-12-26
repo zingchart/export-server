@@ -10,7 +10,8 @@ on:
 
 # Environment variables available to all jobs and steps in this workflow
 env:
-  CI: true
+  PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
+  APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
     
 # jobs are the different pipelines
 jobs:
@@ -18,16 +19,12 @@ jobs:
 
     runs-on: ubuntu-latest
     name: Publish and Deploy
+    
     # define all the steps in the "build" stage
     steps:
     # deploy to GAE step
-    - name: Google Cloud Platform (GCP) CLI - gcloud
-      uses: actions-hub/gcloud@272.0.0
-      with:
-        # Project id
-        PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
-        APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
-
+    - uses: actions-hub/gcloud@272.0.0
+      
     # Configure where to deploy export server
     - name: Deploy Stage
       if: github.ref	== 'stage'
