@@ -11,8 +11,6 @@ on:
 # Environment variables available to all jobs and steps in this workflow
 env:
   CI: true
-  PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
-  APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
     
 # jobs are the different pipelines
 jobs:
@@ -22,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [12.x]
 
     # define all the steps in the "build" stage
     steps:
