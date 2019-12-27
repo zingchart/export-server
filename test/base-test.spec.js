@@ -34,21 +34,11 @@ describe(`Server Route Test's`, function() {
 
   // test the output for PNG creation
   // ---------------------------------
-  describe.skip('PNG Creation', function() {
-    it.skip(' Post / PNG output is OK', async function(done) {
-      axios.post('http://localhost:8080/')
-        .then(function (response) {
-          // console.log(response);
-          expect(response.statusText).to.equal('OK');
-          expect(response.status).to.equal(200);
-          done();
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    });
+  describe('PNG Creation', function() {
 
-    it.skip('Post /json PNG output is exact match', async function(done) {
+
+    // test to make sure the image matches
+    it('Post /json PNG output is exact match', async function() {
       try {
         let chartConfig = require('./configs/plain-chart.js');
 
@@ -62,9 +52,9 @@ describe(`Server Route Test's`, function() {
             height: '500px',
             width: '500px'
           }
-        })
+        });
         // pipe results into dist folder
-        response.data.pipe(fs.createWriteStream(`${__dirname}/dist/test1.png`));
+        response.data.pipe(await fs.createWriteStream(`${__dirname}/dist/test1.png`));
         // check results again reference image and pipe to dist/diff 
         let blinkDiffResults = await utils.compareScreenshotsBlinkDiff(
           `${__dirname}/dist/test1.png`, // file 1
@@ -75,7 +65,7 @@ describe(`Server Route Test's`, function() {
         expect(blinkDiffResults.pass).to.equal(true);
         expect(blinkDiffResults.differences).to.equal(0);
       } catch(e) {
-        console.error(e);
+        if (process.env.DEBUG) console.error(e);
       }
     });
   });
