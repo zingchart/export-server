@@ -15,3 +15,9 @@
 
 # Node.js dependencies:
 node_modules/
+
+# ignore test directory
+test/
+
+# ignore github actions yaml files
+.github/

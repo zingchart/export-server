@@ -1,12 +1,8 @@
 # overall CI pipeline name
 name: Build and test export server
 
-# only run on master and stage branches
-on:
-  push:
-    branches:
-    - master
-    - stage
+# Run tests on EVERY branch and push
+on: [push]
 
 # Environment variables available to all jobs and steps in this workflow
 env:
@@ -24,16 +20,15 @@ jobs:
 
     # define all the steps in the "build" stage
     steps:
-    # use the checkout action
+    # use the checkout action to get repository contents
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     # Try to build and run tests again export server
-    - name: npm install, build, and test
+    - name: Run Tests
       run: |
         npm ci
-        npm run build --if-present
         npm test
 

@@ -21,8 +21,10 @@ env:
 jobs:
   build:
 
+    # Define the OS and name
     runs-on: ubuntu-latest
     name: Publish and Deploy
+
     # define all the steps in the "build" stage
     steps:
     # This step checks out a copy of your repository.
@@ -32,9 +34,12 @@ jobs:
       if: github.ref == 'refs/heads/stage'
       uses: actions-hub/gcloud@master
       with:
-        args: app deploy app-stage.yaml --version test
+        # This step deploys
+        args: app deploy app-stage.yaml --version stage
+    # This step checks out and logs in to gcloud
     - name: Deploy Production
       if: github.ref == 'refs/heads/master'
       uses: actions-hub/gcloud@master
       with:
+        # This step deploys to production
         args: app deploy app.yaml --version master
