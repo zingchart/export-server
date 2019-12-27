@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x]
+        node-version: [10.14.2]
 
     # define all the steps in the "build" stage
     steps:
