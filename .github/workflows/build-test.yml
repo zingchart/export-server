@@ -22,13 +22,15 @@ jobs:
     steps:
     # use the checkout action to get repository contents
     - uses: actions/checkout@v1
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     # Try to build and run tests again export server
     - name: Run Tests
       run: |
-        npm ci
+        npm ci 
         npm test
 

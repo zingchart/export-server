@@ -11,7 +11,7 @@ on:
 # Environment variables available to all jobs and steps in this workflow
 env:
   # Project id
-  PROJECT_ID: export-server
+  PROJECT_ID: ${{secrets.GCLOUD_PROJECT_ID}}
   # GCP authorization credentials
   APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
   # define to use gcloud over gsutil
@@ -36,7 +36,7 @@ jobs:
       with:
         # This step deploys to stage and the --no-promote flag prevents
         # traffic from being split to this version
-        args: app deploy app-stage.yaml --version stage 
+        args: app deploy app-stage.yaml --version stage --no-promote
     # This step checks out and logs in to gcloud
     - name: Deploy Production
       if: github.ref == 'refs/heads/master'
