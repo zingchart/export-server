@@ -1,6 +1,7 @@
 runtime: nodejs10
 instance_class: F4_1G
 service: default
+version: v2
 env_variables:
   NODE_ENV: stage
 # prevents all traffic from splitting immediately
