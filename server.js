@@ -141,45 +141,35 @@ app.post('/', async (req, res) => {
     //   };
     // });
 
-    // read file asynchronously in case it never returns
-    // fs.readFile(readFilePath, (err, imageFile) => {
+    // request headers
+    let rHeaders = {
+      'Content-Type': '',
+    //  'Content-Length': '',
+    //  'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
+    };
 
-      // catch err
-      // if (err) {
-      //   console.error(err);
-      //   return res.status(500).send('Issue Reading File From Server');
-      // }
+    // set appropriate mime/types
+    switch (imgType) {
+      case 'svg':
+        rHeaders['Content-Type'] = 'image/svg+xml';
+        // rHeaders['Content-Length'] = svgData.length;
+        break;
+      case 'pdf':
+        rHeaders['Content-Type'] = 'application/pdf';
+        // rHeaders['Content-Length'] = imageFile.length;
+        break;
+      case 'png':
+      case 'jpeg':
+      default:
+        rHeaders['Content-Type'] = `image/${imgType}`;
+        // rHeaders['Content-Length'] = imageFile.length;
+    }
 
-      // request headers
-      let rHeaders = {
-       'Content-Type': '',
-      //  'Content-Length': '',
-      //  'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
-      };
+    // write headers
+    res.writeHead(200, rHeaders);
 
-      // set appropriate mime/types
-      switch (imgType) {
-        case 'svg':
-          rHeaders['Content-Type'] = 'image/svg+xml';
-          // rHeaders['Content-Length'] = svgData.length;
-          break;
-        case 'pdf':
-          rHeaders['Content-Type'] = 'application/pdf';
-          // rHeaders['Content-Length'] = imageFile.length;
-          break;
-        case 'png':
-        case 'jpeg':
-        default:
-          rHeaders['Content-Type'] = `image/${imgType}`;
-          // rHeaders['Content-Length'] = imageFile.length;
-      }
-
-      // write headers
-      res.writeHead(200, rHeaders);
-
-      // end the buffer and send
-      return res.end(tmpBuffer);
-    // });
+    // end the buffer and send
+    return res.end(tmpBuffer);
 
   } catch(e) {
     console.error(e);
@@ -299,41 +289,31 @@ app.post('/json', async (req, res) => {
         //   };
         // });
 
-        // read file asynchronously in case it never returns
-        // fs.readFile(readFilePath, (err, imageFile) => {
+        // request headers
+        let rHeaders = {
+        'Content-Type': '',
+        // 'Content-Length': '',
+        'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
+        };
 
-          // catch err
-          // if (err) {
-          //   console.error(err);
-          //   return res.status(500).send('Issue Reading File From Server');
-          // }
+        // set appropriate mime/types
+        switch (imgType) {
+          case 'pdf':
+            rHeaders['Content-Type'] = 'application/pdf';
+            // rHeaders['Content-Length'] = imageFile.length;
+            break;
+          case 'png':
+          case 'jpeg':
+          default:
+            rHeaders['Content-Type'] = `image/${imgType}`;
+            // rHeaders['Content-Length'] = imageFile.length;
+        }
 
-          // request headers
-          let rHeaders = {
-          'Content-Type': '',
-          // 'Content-Length': '',
-          // 'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
-          };
+        // write headers
+        res.writeHead(200, rHeaders);
 
-          // set appropriate mime/types
-          switch (imgType) {
-            case 'pdf':
-              rHeaders['Content-Type'] = 'application/pdf';
-              // rHeaders['Content-Length'] = imageFile.length;
-              break;
-            case 'png':
-            case 'jpeg':
-            default:
-              rHeaders['Content-Type'] = `image/${imgType}`;
-              // rHeaders['Content-Length'] = imageFile.length;
-          }
-
-          // write headers
-          res.writeHead(200, rHeaders);
-
-          // end the buffer and send
-          return res.end(tmpBuffer);
-        // });
+        // end the buffer and send
+        return res.end(tmpBuffer);
       }
     });
   

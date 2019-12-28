@@ -2,8 +2,8 @@ runtime: nodejs10
 instance_class: F4_1G
 service: default
 env_variables:
-  NODE_ENV: production
+  NODE_ENV: stage
 # prevents all traffic from splitting immediately
 # sends a "warmup" request to new version
 inbound_services:
-- warmup
+- warmup 
