@@ -18,7 +18,7 @@
   "dependencies": {
     "blink-diff": "^1.0.13",
     "cors": "2.8.4",
-    "express": "4.15.4",
+    "express": "4.17.3",
     "express-formidable": "1.0.0",
     "fs": "0.0.1-security",
     "puppeteer": "1.19.0",
