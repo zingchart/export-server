@@ -5,7 +5,7 @@ const cors = require('cors');
 const formidable = require('express-formidable');
 
 // code dependencies
-const puppeteer = require('puppeteer');
+const puppeteer = require("puppeteer");
 const fs = require('fs');
 const app = express();
 
@@ -65,7 +65,10 @@ app.post('/', async (req, res) => {
     let tmpBuffer = '';
 
     // launch the headless browser
-    const browser = await puppeteer.launch().catch(err => {
+    const browser = await puppeteer.launch({
+      // Paste "Executable Path" value. Check at `chrome://version/`.
+      executablePath: '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+    }).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
       errorMsgServer = err;
@@ -99,9 +102,6 @@ app.post('/', async (req, res) => {
       console.error(errorMsgServer);
       return res.status(500).send(errorMsg);
     }
-
-    // wait a couple milliseconds for page to appropriately settle??
-    //await page.waitFor(100);
 
     // different actions for different types
     if (imgType === 'pdf') {
@@ -223,7 +223,10 @@ app.post('/json', async (req, res) => {
     let tmpBuffer = '';
 
     // launch the headless browser
-    const browser = await puppeteer.launch().catch(err => {
+    const browser = await puppeteer.launch({
+      // Paste "Executable Path" value. Check at `chrome://version/`.
+      executablePath: '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+    }).catch(err => {
       errorFlag = true;
       errorMsg = 'Issues With Headless Browser';
       errorMsgServer = err;
@@ -233,6 +236,7 @@ app.post('/json', async (req, res) => {
       errorMsg = 'Issues With Headless Browser';
       errorMsgServer = err;
     });
+    page.setDefaultTimeout(0);
 
     // set the viewport size to the chart size
     // default will return a piece of the chart 1000 x 1000
@@ -254,19 +258,18 @@ app.post('/json', async (req, res) => {
 
     // render consoles
     page.on('console', async (msg) => {
-      // newer puppeteer versions use msg._text
-      if (msg && msg._text === '---zingchart_loaded---') {
-
+      if (msg && msg.text() === '---zingchart_loaded---') {
         // clear server timeout
         clearTimeout(serverTimeout);
 
         // wait 0 or user defined amount of time
-        await page.waitFor(waitTime);
+        await page.waitForTimeout(waitTime);
 
         // different actions for different types
         if (imgType === 'pdf') {
           tmpBuffer = await page.pdf({
           }).catch(err => {
+            console.log('1 err: ', err)
             errorFlag = true;
             errorMsg = 'Issues Generating PDF';
             errorMsgServer = err;
@@ -276,6 +279,7 @@ app.post('/json', async (req, res) => {
           tmpBuffer = await page.screenshot({
             type: imgType
           }).catch(err => {
+            console.log('2 err: ', err)
             errorFlag = true;
             errorMsg = 'Issues Generating Screenshot';
             errorMsgServer = err;
@@ -291,54 +295,33 @@ app.post('/json', async (req, res) => {
           return res.status(500).send(errorMsg);
         }
 
-        // We DON'T really care about this and don't want user speed to be affected
-        // by this. This is why we write the JSON file to server asynchronously.
-        // fs.writeFile(outputJSONFilePath, JSON.stringify(chartJSON, null, 2), (err) => {
-        //   if (err) {
-        //     console.error(`Issues writing ${outputJSONFilePath} to server file system`);
-        //   };
-        // });
+        // request headers
+        let rHeaders = {
+        'Content-Type': '',
+        };
 
-        // read file asynchronously in case it never returns
-        // fs.readFile(readFilePath, (err, imageFile) => {
+        // set appropriate mime/types
+        switch (imgType) {
+          case 'pdf':
+            rHeaders['Content-Type'] = 'application/pdf';
+            // rHeaders['Content-Length'] = imageFile.length;
+            break;
+          case 'png':
+          case 'jpeg':
+          default:
+            rHeaders['Content-Type'] = `image/${imgType}`;
+        }
 
-          // catch err
-          // if (err) {
-          //   console.error(err);
-          //   return res.status(500).send('Issue Reading File From Server');
-          // }
+        // write headers
+        res.writeHead(200, rHeaders);
 
-          // request headers
-          let rHeaders = {
-          'Content-Type': '',
-          // 'Content-Length': '',
-          // 'Content-Disposition': `attachment; filename="${fileName}.${imgType}"`
-          };
-
-          // set appropriate mime/types
-          switch (imgType) {
-            case 'pdf':
-              rHeaders['Content-Type'] = 'application/pdf';
-              // rHeaders['Content-Length'] = imageFile.length;
-              break;
-            case 'png':
-            case 'jpeg':
-            default:
-              rHeaders['Content-Type'] = `image/${imgType}`;
-              // rHeaders['Content-Length'] = imageFile.length;
-          }
-
-          // write headers
-          res.writeHead(200, rHeaders);
-
-          // end the buffer and send
-          return res.end(tmpBuffer);
-        // });
+        // end the buffer and send
+        return res.end(tmpBuffer);
       }
     });
   
     // inject zingchart in
-    await  page.addScriptTag({
+    await page.addScriptTag({
       url: 'https://cdn.zingchart.com/zingchart.min.js'
     });
     
